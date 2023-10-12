@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import gitRemoteUrl, { getCurrentBranch, isBranchPublished, getDefaultBranch } from './utils/getRemoteUrl';
+import gitRemoteUrl, { gitCurrentBranch, isBranchPublished, gitDefaultBranch } from './utils/gitRemoteUrl';
 
 enum GitHost {
   github,
@@ -121,11 +121,11 @@ async function genLink() {
 
   const filePath = path.relative(rootPath, window.activeTextEditor!.document.fileName);
 
-  const currentBranch = getCurrentBranch();
+  const currentBranch = gitCurrentBranch();
 
   const isPublished = isBranchPublished(currentBranch);
 
-  const headPosition = isPublished ? currentBranch : getDefaultBranch();
+  const headPosition = isPublished ? currentBranch : gitDefaultBranch();
 
   const remoteUrl = await genGitRemoteUrl(rootPath);
 

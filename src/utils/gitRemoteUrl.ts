@@ -38,7 +38,7 @@ function gitRemoteUrl(content: string) {
   return `${parsedUrl.resource}/${parsedUrl.full_name}`;
 }
 
-function getCurrentBranch(): string {
+function gitCurrentBranch(): string {
   const repository = git.repositories[0]; // Assuming you're working with the first repo, adjust if needed
   return repository.state.HEAD.name;
 }
@@ -48,11 +48,11 @@ function isBranchPublished(branchName: string): boolean {
   return repository.state.refs.some(ref => ref.name === `origin/${branchName}`);
 }
 
-function getDefaultBranch(): string {
+function gitDefaultBranch(): string {
   const repository = git.repositories[0];
   const remoteHEAD = repository.state.refs.find(ref => ref.name === 'origin/HEAD');
   return remoteHEAD?.upstream?.name || 'main'; // 'main' as a fallback
 }
 
 export default gitRemoteUrl;
-export { getCurrentBranch, isBranchPublished, getDefaultBranch };
+export { gitCurrentBranch, isBranchPublished, gitDefaultBranch };
