@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import gitRemoteUrl from './utils/gitRemoteUrl';
+import gitRemoteUrl, { getCurrentBranch, isBranchPublished, getDefaultBranch } from './utils/getRemoteUrl';
 
 enum GitHost {
   github,
@@ -20,8 +20,15 @@ const readFileContent = async (filePath: string) => {
 };
 
 /**
- * generate git HEAD position. like branchName or commitId
- * @param rootPath string
+ * Retrieve the active branch name or the commit ID from the HEAD file.
+ * If the current branch is referenced in the HEAD, it returns the branch name.
+ * If the HEAD is detached (e.g., pointing directly to a commit), it returns the commit ID.
+ * 
+ * Note: The actual logic in the `genLink` function now checks if this branch is published. 
+ * If the branch is not published, the link generation will default to using the repository's default branch.
+ *
+ * @param rootPath - Path to the root directory of the repository.
+ * @returns - Active branch name or commit ID.
  */
 const genGitHEAD = async (rootPath: string): Promise<string> => {
   const content = await readFileContent(gitFilePath(rootPath, 'HEAD'));
@@ -114,7 +121,11 @@ async function genLink() {
 
   const filePath = path.relative(rootPath, window.activeTextEditor!.document.fileName);
 
-  const headPosition = await genGitHEAD(rootPath);
+  const currentBranch = getCurrentBranch();
+
+  const isPublished = isBranchPublished(currentBranch);
+
+  const headPosition = isPublished ? currentBranch : getDefaultBranch();
 
   const remoteUrl = await genGitRemoteUrl(rootPath);
 
